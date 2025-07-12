@@ -4,47 +4,64 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.bunghttprequests.data.dao.PostsDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-@Entity(tableName = "posts")
-data class PostStorage(
-    val userId: Int,
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val title: String,
-    val body: String
-)
 
-interface PostsStorage {
-    suspend fun insertPosts(post: List<PostRepository.Post>)
-    fun getPosts(): Flow<List<PostStorage>>
-    suspend fun getPostById(id: Int): PostStorage?
+object LocalStorageService {
+    @Entity(tableName = "local_posts")
+    data class LocalPostStorage(
+        val userId: Int,
+        @PrimaryKey(autoGenerate = true) val id: Int = 0,
+        val title: String,
+        val body: String
+    )
 
-    suspend fun deleteAllPosts()
-}
+    interface LocalPostsStorage {
+        suspend fun insertLocalPosts(post: List<PostRepository.Post>)
+        fun getLocalPosts(): Flow<List<LocalPostStorage>>
+        suspend fun getLocalPostById(id: Int): LocalPostStorage?
 
-class PostsStorageImpl(private val dao: PostsDao) : PostsStorage {
-    override suspend fun insertPosts(posts: List<PostRepository.Post>) {
-        val postStorageEntities = posts.map { post ->
-            PostStorage(
-                // Wenn die ID von der API kommt, verwenden wir sie.
-                // Wenn nicht (z.B. bei einem neuen Post), lassen wir Room sie auto-generieren (id = 0).
-                userId = post.userId,
-                id = post.id?: 0,
-                title = post.title,
-                body = post.body
-            )
+        suspend fun deleteAllLocalPosts()
+    }
+
+    class PostsStorageImpl(private val dao: PostsDao) : LocalPostsStorage {
+        override suspend fun insertLocalPosts(posts: List<PostRepository.Post>) {
+            val postStorageEntities = posts.map { post ->
+                LocalPostStorage(
+                    // Wenn die ID von der API kommt, verwenden wir sie.
+                    // Wenn nicht (z.B. bei einem neuen Post), lassen wir Room sie auto-generieren (id = 0).
+                    userId = post.userId,
+                    id = post.id?: 0,
+                    title = post.title,
+                    body = post.body
+                )
+            }
+            dao.insert(postStorageEntities)
         }
-        dao.insert(postStorageEntities)
-    }
 
-    override fun getPosts(): Flow<List<PostStorage>> {
-        return dao.getAllPosts()
-    }
+        override fun getLocalPosts(): Flow<List<LocalPostStorage>> {
+            return dao.getAllLocalPosts()
+        }
 
-    override suspend fun getPostById(id: Int): PostStorage? {
-        return dao.getPostById(id)
-    }
+        override suspend fun getLocalPostById(id: Int): LocalPostStorage? {
+            return dao.getLocalPostById(id)
+        }
 
-    override suspend fun deleteAllPosts() {
-        dao.deleteAllPosts()
+        override suspend fun deleteAllLocalPosts() {
+            dao.deleteAllLocalPosts()
+        }
     }
 }
+
+
+//fun postsStorageDataFlow(): Flow<List<PostStorage>> = flow {
+//    emit(getPosts())
+//}
+//
+//interface FestivalRepositoryFlow{
+//    fun getFestivalsFlow(): Flow<List<FestivalData>>
+//}
+//
+//class FestivalRepositoryImplFlow: FestivalRepositoryFlow{
+//    override fun getFestivalsFlow(): Flow<List<FestivalData>> = festivalDataFlow()
+//}

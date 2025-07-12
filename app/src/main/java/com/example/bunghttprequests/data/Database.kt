@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.bunghttprequests.data.dao.PostsDao
 
-@Database(entities = [PostStorage::class], version = 1, exportSchema = false)
+@Database(entities = [LocalStorageService.LocalPostStorage::class], version = 1, exportSchema = false)
 
 abstract class PostDatabase : RoomDatabase() {
     abstract fun postDao(): PostsDao

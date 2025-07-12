@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.bunghttprequests.presentation.viewmodels.PostsViewModel
 
 object AppModule {
-    private fun providePostStorage(context: Context): PostsStorage {
-        return PostsStorageImpl(DatabaseProvider.providePostDao(context))
+    private fun providePostStorage(context: Context): LocalStorageService.LocalPostsStorage{
+        return LocalStorageService.PostsStorageImpl(DatabaseProvider.providePostDao(context))
     }
 
     fun providePostsViewModelFactory(context: Context): ViewModelProvider.Factory {
