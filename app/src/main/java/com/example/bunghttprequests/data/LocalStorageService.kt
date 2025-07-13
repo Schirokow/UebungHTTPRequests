@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.bunghttprequests.data.dao.PostsDao
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 
 object LocalStorageService {
@@ -18,7 +17,9 @@ object LocalStorageService {
 
     interface LocalPostsStorage {
         suspend fun insertLocalPosts(post: List<PostRepository.Post>)
-        fun getLocalPosts(): Flow<List<LocalPostStorage>>
+
+//        suspend fun insertNewPost(post: PostRepository.Post)
+        fun getAllLocalPosts(): Flow<List<LocalPostStorage>>
         suspend fun getLocalPostById(id: Int): LocalPostStorage?
 
         suspend fun deleteAllLocalPosts()
@@ -39,7 +40,21 @@ object LocalStorageService {
             dao.insert(postStorageEntities)
         }
 
-        override fun getLocalPosts(): Flow<List<LocalPostStorage>> {
+//        override suspend fun insertNewPost(posts: PostRepository.Post) {
+////            val newPostStorageEntities = posts.map { post ->
+////                LocalPostStorage(
+////                    // Wenn die ID von der API kommt, verwenden wir sie.
+////                    // Wenn nicht (z.B. bei einem neuen Post), lassen wir Room sie auto-generieren (id = 0).
+////                    userId = post.userId,
+////                    id = post.id?: 0,
+////                    title = post.title,
+////                    body = post.body
+////                )
+////            }
+//            dao.insertNewPost(PostRepository.Post)
+//        }
+
+        override fun getAllLocalPosts(): Flow<List<LocalPostStorage>> {
             return dao.getAllLocalPosts()
         }
 
@@ -54,14 +69,8 @@ object LocalStorageService {
 }
 
 
-//fun postsStorageDataFlow(): Flow<List<PostStorage>> = flow {
-//    emit(getPosts())
+
+//fun localStorageDataFlow(): Flow<List<LocalStorageService.LocalPostStorage>> = flow {
+//    emit(LocalStorageService.PostsStorageImpl.getLocalPosts())
 //}
-//
-//interface FestivalRepositoryFlow{
-//    fun getFestivalsFlow(): Flow<List<FestivalData>>
-//}
-//
-//class FestivalRepositoryImplFlow: FestivalRepositoryFlow{
-//    override fun getFestivalsFlow(): Flow<List<FestivalData>> = festivalDataFlow()
-//}
+

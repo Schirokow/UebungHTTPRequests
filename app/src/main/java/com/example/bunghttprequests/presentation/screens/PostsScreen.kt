@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.AddComment
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,23 +41,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bunghttprequests.card.PostCard
+import com.example.bunghttprequests.data.LocalStorageService
 
 import com.example.bunghttprequests.data.PostRepository
+import com.example.bunghttprequests.data.PostRepository.createPost
 
 import com.example.bunghttprequests.presentation.viewmodels.PostsViewModel
 import com.example.bunghttprequests.ui.theme.ÜbungHTTPRequestsTheme
 import kotlinx.coroutines.launch
+import java.nio.file.WatchEvent
 
 @Composable
 fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
 
-
+//    val localPostStorage: LocalStorageService.LocalPostsStorage? = null
     val postsDataList by viewModel.postsData.collectAsState()
+//    val postsDataList by viewModel.localStorageState.collectAsState()
     val scope = rememberCoroutineScope()
 
     var eingabe by remember {
         mutableStateOf("")
     }
+
+    var title by remember {
+        mutableStateOf("")
+    }
+
 
 //    if (postsDataList.isEmpty()) {
 //        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -81,9 +91,6 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                     .width(100.dp),
                 onClick = {
                     viewModel.loadAllPosts()
-//                    scope.launch {
-//                        posts = getPosts()
-//                    }
                 }
             ) {
                 Text("laden")
@@ -105,19 +112,33 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
+        TextField(
+            value = title,
+            singleLine = true,
+            placeholder = {Text("Titel")},
+            onValueChange = { text ->
+                title = text
+            },
+            modifier = Modifier.padding(start = 50.dp)
+        )
+        Spacer(modifier = Modifier.height(6.dp))
         Row (
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 50.dp)
         ){
+
             TextField(
                 value = eingabe,
                 singleLine = true,
+                placeholder = {Text("Text eingeben")},
                 onValueChange = { text ->
                     eingabe = text
                 }
             )
+            val newPost = PostRepository.Post(userId = 9, title = title, body = eingabe)
+
             Spacer(modifier = Modifier.width(10.dp))
             Icon(
                 imageVector = Icons.Rounded.Send,
@@ -126,10 +147,11 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                 modifier = Modifier
                     .size(34.dp)
                     .clickable{
-                    Log.d("AddIcon", "createPost funktion mit: $eingabe ausgefürt")
+                    Log.d("AddIcon", "createPost funktion mit: $newPost ausgefürt")
                     if (eingabe.isNotBlank()) {
                         scope.launch {
-//                            createPost(eingabe)
+                            createPost(newPost)
+//                            localPostStorage?.insertNewPost(newPost)
                         }
                         eingabe = ""
                    }

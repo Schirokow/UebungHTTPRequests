@@ -68,6 +68,9 @@ dependencies {
     // Coroutines (für Room-Queries)
     implementation(libs.kotlinx.coroutines.android)
 
+    // Extended Icons
+    implementation(libs.androidx.material.icons.extended)
+
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     testImplementation(libs.junit)

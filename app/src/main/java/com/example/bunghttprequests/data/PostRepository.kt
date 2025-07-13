@@ -24,10 +24,26 @@ object PostRepository {
     )
 
     suspend fun getPosts(): List<Post> {
-        return client.get("https://jsonplaceholder.typicode.com/posts").body()
+        return try {
+            withContext(Dispatchers.IO){
+                client.get("https://jsonplaceholder.typicode.com/posts"){
+                    contentType(ContentType.Application.Json)
+                }.body<List<Post>>()
+            }
+        } catch (e: Exception){
+            println("Fehler beim laden des Posts: ${e.message}")
+        } as List<Post>
     }
 
-    suspend fun createPost(newPost: String): Post?{
+//    suspend fun getPostsByUserId(userId: Int): List<Post>{
+//
+//    }
+//
+//    suspend fun getPostById(id: Int): Post?{
+//
+//    }
+
+    suspend fun createPost(newPost: Post): Post?{
         return try {
             withContext(Dispatchers.IO){
                 client.post("https://jsonplaceholder.typicode.com/posts"){
@@ -39,6 +55,10 @@ object PostRepository {
             println("Fehler beim erstellen des Posts: ${e.message}")
             null
         }
+    }
+
+    suspend fun updatePost(post: Post){
+
     }
 }
 
