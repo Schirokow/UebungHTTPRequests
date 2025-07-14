@@ -95,7 +95,9 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                 )))
         ) {
             Column (
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 20.dp)
             ){
                 Row (
                     modifier = Modifier
@@ -136,14 +138,14 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                     onValueChange = { text ->
                         title = text
                     },
-                    modifier = Modifier.padding(start = 50.dp)
+                    modifier = Modifier.padding(start = 65.dp)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Row (
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 50.dp)
+//                        .padding(start = 50.dp)
                 ){
 
                     TextField(
@@ -152,7 +154,8 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                         placeholder = {Text("Text eingeben")},
                         onValueChange = { text ->
                             eingabe = text
-                        }
+                        },
+                        modifier = Modifier.padding(start = 65.dp)
                     )
                     val newPost = PostRepository.Post(userId = 9, title = title, body = eingabe)
 
@@ -170,6 +173,7 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                                         createPost(newPost)
 //                            localPostStorage?.insertNewPost(newPost)
                                     }
+                                    title = ""
                                     eingabe = ""
                                 }
                             }
