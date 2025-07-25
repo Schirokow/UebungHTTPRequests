@@ -73,6 +73,21 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    // Koin
+    implementation("io.insert-koin:koin-android:4.1.0")
+    implementation("io.insert-koin:koin-androidx-navigation:4.1.0")
+    implementation("io.insert-koin:koin-androidx-compose:4.1.0")
+    testImplementation("io.insert-koin:koin-test-junit4:4.1.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-moshi:3.0.0")
+    implementation("com.squareup.okhttp3:okhttp:5.1.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

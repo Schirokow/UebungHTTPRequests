@@ -19,9 +19,10 @@ import kotlinx.coroutines.launch
 
 class PostsViewModel(
     private val localPostStorage: LocalStorageService.LocalPostsStorage,
+    private val getPostsUseCase: GetPostsUseCase
 //    private val dao: PostsDao
 ): ViewModel() {
-    private val getPostsUseCase: GetPostsUseCase = GetPostsUseCase()
+//    private val getPostsUseCase: GetPostsUseCase = GetPostsUseCase()
 
     private val _postsData = MutableStateFlow<List<PostRepository.Post>>(emptyList())
     val postsData: StateFlow<List<PostRepository.Post>> = _postsData.asStateFlow()

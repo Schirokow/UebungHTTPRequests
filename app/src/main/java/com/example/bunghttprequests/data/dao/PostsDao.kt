@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(post: List<LocalStorageService.LocalPostStorage>) // Fügt Post ein
 
 //    @Insert(onConflict = OnConflictStrategy.REPLACE)

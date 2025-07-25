@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -45,9 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bunghttprequests.card.PostCard
 import com.example.bunghttprequests.data.LocalStorageService
-
+import org.koin.androidx.compose.koinViewModel
 import com.example.bunghttprequests.data.PostRepository
 import com.example.bunghttprequests.data.PostRepository.createPost
 
@@ -57,10 +59,13 @@ import kotlinx.coroutines.launch
 import java.nio.file.WatchEvent
 
 @Composable
-fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
+fun PostsScreen(modifier: Modifier = Modifier) {
+
+    val postsViewModel: PostsViewModel = koinViewModel<PostsViewModel>()
+    val postsDataList by postsViewModel.postsData.collectAsState()
 
 //    val localPostStorage: LocalStorageService.LocalPostsStorage? = null
-    val postsDataList by viewModel.postsData.collectAsState()
+//    val postsDataList by viewModel.postsData.collectAsState()
 //    val postsDataList by viewModel.localStorageState.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -109,7 +114,8 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                         modifier = Modifier
                             .width(100.dp),
                         onClick = {
-                            viewModel.loadAllPosts()
+//                            viewModel.loadAllPosts()
+                            postsViewModel.loadAllPosts()
                         }
                     ) {
                         Text("laden")
@@ -119,7 +125,8 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                         modifier = Modifier
                             .width(100.dp),
                         onClick = {
-                            viewModel.deleteAllPosts()
+//                            viewModel.deleteAllPosts()
+                            postsViewModel.deleteAllPosts()
 //                    post = emptyList()
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -131,10 +138,10 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
-                TextField(
+                OutlinedTextField(
                     value = title,
                     singleLine = true,
-                    placeholder = {Text("Titel")},
+                    placeholder = {Text("Titel", color = Color.White)},
                     onValueChange = { text ->
                         title = text
                     },
@@ -148,10 +155,10 @@ fun PostsScreen(modifier: Modifier = Modifier, viewModel: PostsViewModel) {
 //                        .padding(start = 50.dp)
                 ){
 
-                    TextField(
+                    OutlinedTextField(
                         value = eingabe,
                         singleLine = true,
-                        placeholder = {Text("Text eingeben")},
+                        placeholder = {Text("Text eingeben", color = Color.White)},
                         onValueChange = { text ->
                             eingabe = text
                         },

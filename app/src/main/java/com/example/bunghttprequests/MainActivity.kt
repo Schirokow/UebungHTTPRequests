@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.bunghttprequests.data.AppModule
+//import com.example.bunghttprequests.data.AppModule
 import com.example.bunghttprequests.presentation.screens.PostsScreen
 import com.example.bunghttprequests.ui.theme.ÜbungHTTPRequestsTheme
 
@@ -29,10 +29,10 @@ class MainActivity : ComponentActivity() {
                     // Hole den aktuellen Kontext
                     val context = LocalContext.current
                     // Erstelle die ViewModel Factory
-                    val viewModelFactory = AppModule.providePostsViewModelFactory(context)
+//                    val viewModelFactory = AppModule.providePostsViewModelFactory(context)
                     PostsScreen(
                         modifier = Modifier.padding(innerPadding),
-                        viewModel = viewModel(factory = viewModelFactory)
+//                        viewModel = viewModel(factory = viewModelFactory)
                     )
                 }
             }
