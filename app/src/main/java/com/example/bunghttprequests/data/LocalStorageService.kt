@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.bunghttprequests.data.dao.PostsDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+
 
 
 object LocalStorageService {
@@ -21,6 +23,7 @@ object LocalStorageService {
 //        suspend fun insertNewPost(post: PostRepository.Post)
         fun getAllLocalPosts(): Flow<List<LocalPostStorage>>
         suspend fun getLocalPostById(id: Int): LocalPostStorage?
+        suspend fun deleteLocalPostById(id: Int)
 
         suspend fun deleteAllLocalPosts()
     }
@@ -60,6 +63,10 @@ object LocalStorageService {
 
         override suspend fun getLocalPostById(id: Int): LocalPostStorage? {
             return dao.getLocalPostById(id)
+        }
+
+        override suspend fun deleteLocalPostById(id: Int){
+            dao.deleteLocalPostsById(id)
         }
 
         override suspend fun deleteAllLocalPosts() {

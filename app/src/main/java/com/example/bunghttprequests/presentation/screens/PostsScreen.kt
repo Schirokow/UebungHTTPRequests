@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddComment
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -62,7 +63,8 @@ import java.nio.file.WatchEvent
 fun PostsScreen(modifier: Modifier = Modifier) {
 
     val postsViewModel: PostsViewModel = koinViewModel<PostsViewModel>()
-    val postsDataList by postsViewModel.postsData.collectAsState()
+//    val postsDataList by postsViewModel.postsData.collectAsState()
+    val postsDataList by postsViewModel.localStorageState.collectAsState()
 
 //    val localPostStorage: LocalStorageService.LocalPostsStorage? = null
 //    val postsDataList by viewModel.postsData.collectAsState()
@@ -206,11 +208,35 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ){
                     items(postsDataList){ post ->
+                        Spacer(modifier = Modifier.height(60.dp))
+
+                        Row (modifier = Modifier
+                            .fillMaxWidth()
+                        )
+                        {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Red,
+                                modifier = Modifier
+                                    .padding(end = 20.dp)
+                                    .size(34.dp)
+                                    .clickable{
+                                        Log.d("DeleteIcon", "Post mit der Id:${post.id} gelöscht")
+                                        scope.launch {
+                                            postsViewModel.deleteLocalPostById(post.id)
+                                        }
+                                    }
+                            )
+//
+                        }
+
                         PostCard(
                             title = post.title,
                             body = post.body,
                             onClick = {}
                         )
+
                     }
                 }
             }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PostsDao {
 //    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(post: List<LocalStorageService.LocalPostStorage>) // Fügt Post ein
 
 //    @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -26,5 +26,8 @@ interface PostsDao {
 
     @Query("DELETE FROM local_posts")
     suspend fun deleteAllLocalPosts() // Methode zum Löschen aller Posts
+
+    @Query("DELETE FROM local_posts WHERE id = :id")
+    suspend fun deleteLocalPostsById(id: Int) // Methode zum Löschen Posts by Id
 
 }

@@ -24,8 +24,8 @@ class PostsViewModel(
 ): ViewModel() {
 //    private val getPostsUseCase: GetPostsUseCase = GetPostsUseCase()
 
-    private val _postsData = MutableStateFlow<List<PostRepository.Post>>(emptyList())
-    val postsData: StateFlow<List<PostRepository.Post>> = _postsData.asStateFlow()
+//    private val _postsData = MutableStateFlow<List<PostRepository.Post>>(emptyList())
+//    val postsData: StateFlow<List<PostRepository.Post>> = _postsData.asStateFlow()
 
     private val _localStorageState = MutableStateFlow<List<LocalStorageService.LocalPostStorage>>(emptyList())
     val localStorageState: StateFlow<List<LocalStorageService.LocalPostStorage>> = _localStorageState.asStateFlow()
@@ -71,7 +71,13 @@ class PostsViewModel(
         viewModelScope.launch {
             // Posts laden
             getPostsUseCase.getPostsFlow().collect { posts ->
-                _postsData.value = posts
+                localPostStorage.insertLocalPosts(posts)
+//                _postsData.value = posts
+            }
+
+            // Sammle Daten von der lokalen Speicherung
+            localPostStorage.getAllLocalPosts().collect { localPosts ->
+                _localStorageState.value = localPosts
             }
         }
 
@@ -82,7 +88,7 @@ class PostsViewModel(
             try {
                 getPostsUseCase.getPostsFlow().collect { posts ->
                     localPostStorage.insertLocalPosts(posts)
-                    _postsData.value = posts
+//                    _postsData.value = posts
                     Log.i("PostsViewModel", "All Posts loaded")
                 }
             } catch (e: Exception){
@@ -98,10 +104,21 @@ class PostsViewModel(
         viewModelScope.launch {
             try {
                 localPostStorage.deleteAllLocalPosts()
-                _postsData.value = emptyList()
+//                _postsData.value = emptyList()
                 Log.i("PostsViewModel", "All Posts deleted")
             } catch (e: Exception) {
                 Log.e("PostsViewModel", "Error deleting Posts: ${e.message}")
+            }
+        }
+    }
+
+    fun deleteLocalPostById(id: Int) {
+        viewModelScope.launch {
+            try {
+                localPostStorage.deleteLocalPostById(id)
+                Log.i("PostsViewModel", "Post by Id:$id deleted")
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error deleting Post by Id:$id : ${e.message}")
             }
         }
     }
