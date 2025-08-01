@@ -2,6 +2,8 @@ package com.example.bunghttprequests.presentation.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +26,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddComment
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -45,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +66,7 @@ import com.example.bunghttprequests.presentation.viewmodels.PostsViewModel
 import com.example.bunghttprequests.ui.theme.ÜbungHTTPRequestsTheme
 import kotlinx.coroutines.launch
 import java.nio.file.WatchEvent
+import kotlin.collections.set
 
 @Composable
 fun PostsScreen(modifier: Modifier = Modifier) {
@@ -71,7 +79,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     // State, um ausgewählte Post zu speichern
-    var selectedPost by remember { mutableStateOf<PostRepository.Post?>(null).also {
+    var selectedPost by remember { mutableStateOf<LocalStorageService.LocalPostStorage?>(null).also {
         Log.d(TAG, "Selected post state initialized")
     } }
 
@@ -245,44 +253,131 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ){
                     items(postsDataList){ post ->
-                        Spacer(modifier = Modifier.height(60.dp))
-
-                        Row (modifier = Modifier
-                            .fillMaxWidth()
-                        )
-                        {
-                            Icon(
-                                imageVector = Icons.Rounded.Delete,
-                                contentDescription = "Delete",
-                                tint = Color.Red,
-                                modifier = Modifier
-                                    .padding(end = 20.dp)
-                                    .size(34.dp)
-                                    .clickable{
-                                        Log.d("DeleteIcon", "Post mit der Id:${post.id} gelöscht")
-                                        if (post.userId == 9){
-                                            scope.launch {
-                                                postsViewModel.deleteLocalPostById(post.id)
-                                            }
-                                        } else{
-                                            scope.launch {
-                                                postsViewModel.deleteLocalPostById(post.id)
-                                            }
-                                        }
-
-                                    }
-                            )
-//
-                        }
-
                         PostCard(
                             title = post.title,
                             body = post.body,
-                            onClick = {}
+                            onClick = {
+                                Log.d(TAG, "Festival card clicked - id: ${post.id}, title: ${post.title.take(15)}...")
+                                selectedPost = post
+                            }
                         )
 
                     }
                 }
+            }
+
+
+        }
+    }
+
+    val animateScale by animateFloatAsState(
+        targetValue = if (selectedPost != null) 1f else 0.5f,
+        animationSpec = tween(durationMillis = 400)
+    )
+
+    // Overlay für vergrößertes Bild, wenn selectedPost nicht null ist
+    selectedPost?.let { post ->
+        Log.d(TAG, "Showing detail overlay for post id: ${post.id}")
+
+        Surface(
+            color = BackgroundColor.copy(alpha = 0.9f), // Farbe von Hintergrund
+            modifier = Modifier.fillMaxSize(),
+            onClick = { /*selectedPost = null */} // Klick außerhalb schließt das Overlay
+        ) {
+            Box (
+                modifier = Modifier.fillMaxSize()
+            ){
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 100.dp)
+                        .align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+
+//                    Text(
+//                        text = festival.title,
+//                        style = MaterialTheme.typography.headlineMedium,
+//                        color = Color.White,
+//                        modifier = Modifier.padding(bottom = 8.dp)
+//                    )
+                    PostCard(
+                        title = post.title,
+                        body = post.body,
+                        onClick = {},
+                        modifier = Modifier
+                            .graphicsLayer(scaleX = animateScale, scaleY = animateScale)
+                            .fillMaxWidth(0.9f)
+//                            .fillMaxHeight(0.5f)
+                            .height(300.dp)
+                    )
+
+//                    Card (
+//                        modifier = Modifier
+//                            .graphicsLayer(scaleX = animateScale, scaleY = animateScale)
+//                            .fillMaxWidth(0.9f)
+//                            .fillMaxHeight(0.5f)
+//                            .clickable{
+//                                Log.d(TAG, "Navigating to detail screen for id: ${festival.id}")
+//                                navController.navigate("ContentDetailScreen/${festival.id}")
+//                                      },
+//                        shape = RoundedCornerShape(16.dp),
+//                        elevation = CardDefaults.cardElevation(12.dp)
+//                    ){
+//                        Image(
+//                            painter = painterResource(id = festival.imageId),
+//                            contentDescription = "Vergrößertes Bild",
+//                            contentScale = ContentScale.FillBounds,
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                        )
+//                    }
+
+
+                }
+
+                Icon(
+                    imageVector = Icons.Rounded.ArrowBack,
+                    contentDescription = "Close",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopStart)
+                        .padding(start = 24.dp, top = 42.dp)
+                        .size(34.dp)
+                        .clickable{
+                            Log.d(TAG, "Close button clicked, hiding detail view")
+                            selectedPost = null
+                        }
+                )
+
+                Icon(
+                    imageVector = Icons.Rounded.Delete,
+                    contentDescription = "Delete",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .align(alignment = Alignment.TopEnd)
+                        .padding(end = 24.dp, top = 42.dp)
+                        .size(34.dp)
+                        .clickable{
+                            Log.d("DeleteIcon", "Post mit der Id:${post.id} gelöscht")
+                            if (post.userId == 9){
+                                scope.launch {
+                                    postsViewModel.deleteLocalPostById(post.id)
+                                }
+                                selectedPost = null
+                            } else{
+                                scope.launch {
+                                    postsViewModel.deleteLocalPostById(post.id)
+                                }
+                                selectedPost = null
+                            }
+
+                        }
+                )
+                //Erklärung:
+                //Der Favoritenstatus wird mit favoriteStates (eine mutableStateMapOf) dynamisch geladen, um UI-Reaktivität zu gewährleisten.
+                //LaunchedEffect lädt den Favoritenstatus für jedes Festival beim Rendern.
+                //Der Favoriten-Button toggelt den Status und aktualisiert favoriteStates.
             }
 
         }
@@ -304,3 +399,4 @@ fun PostsScreenPreview() {
 val AccentColor = Color(0xFF29719E)
 val BottomDarkBlue = Color(0xFF1A4D6C)
 val TopLightBlue = Color(0xFF62A7C3)
+val BackgroundColor = Color(0xFF20587B)
