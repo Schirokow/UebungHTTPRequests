@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 fun PreviewNewEventCard(){
 
     PostCard(
+        userId = 1,
         title = "Test Post",
         body = "ein Post zum testen!",
         onClick = {}
@@ -34,6 +35,7 @@ fun PreviewNewEventCard(){
 
 @Composable
 fun PostCard(
+    userId: Int,
     title: String,
     body: String,
     modifier : Modifier = Modifier,
@@ -56,6 +58,12 @@ fun PostCard(
                 Column(
                     modifier = Modifier.padding(8.dp)
                 ){
+                    Text(
+                        text = "userId:$userId",
+                        color = Color.Red,
+                        fontSize = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = title,
                         color = Color.Blue,

@@ -3,27 +3,23 @@ package com.example.bunghttprequests.presentation.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bunghttprequests.business.event.LocalPostState
-import com.example.bunghttprequests.business.event.PostEvent
 import com.example.bunghttprequests.business.usecases.CreatePostUseCase
+import com.example.bunghttprequests.business.usecases.GetPostsByUserIdUseCase
 import com.example.bunghttprequests.business.usecases.GetPostsUseCase
 import com.example.bunghttprequests.business.usecases.UpdatePostUseCase
 import com.example.bunghttprequests.data.LocalStorageService
 import com.example.bunghttprequests.data.PostRepository
-import com.example.bunghttprequests.data.dao.PostsDao
-import io.ktor.util.Hash.combine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PostsViewModel(
     private val localPostStorage: LocalStorageService.LocalPostsStorage,
     private val getPostsUseCase: GetPostsUseCase,
     private val createPostUseCase: CreatePostUseCase,
-    private val updatePostUseCase: UpdatePostUseCase
+    private val updatePostUseCase: UpdatePostUseCase,
+    private val getPostsByUserIdUseCase: GetPostsByUserIdUseCase
 //    private val dao: PostsDao
 ): ViewModel() {
 //    private val getPostsUseCase: GetPostsUseCase = GetPostsUseCase()
@@ -100,6 +96,20 @@ class PostsViewModel(
                 }
             } catch (e: Exception){
                 Log.e("PostsViewModel", "Error loading Posts: ${e.message}")
+            }
+
+        }
+    }
+
+    fun loadPostsByUserId(userId: Int?) {
+        viewModelScope.launch {
+            try {
+                getPostsByUserIdUseCase.getPostsByUserIdFlow(userId).collect { posts ->
+                    localPostStorage.insertLocalPosts(posts)
+                    Log.i("PostsViewModel", "All Posts by userId loaded")
+                }
+            } catch (e: Exception){
+                Log.e("PostsViewModel", "Error loading Posts by userId: ${e.message}")
             }
 
         }

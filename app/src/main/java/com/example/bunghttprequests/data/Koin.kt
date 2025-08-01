@@ -1,6 +1,7 @@
 package com.example.bunghttprequests.data
 
 import com.example.bunghttprequests.business.usecases.CreatePostUseCase
+import com.example.bunghttprequests.business.usecases.GetPostsByUserIdUseCase
 import com.example.bunghttprequests.business.usecases.GetPostsUseCase
 import com.example.bunghttprequests.business.usecases.UpdatePostUseCase
 import com.example.bunghttprequests.presentation.viewmodels.PostsViewModel
@@ -40,6 +41,10 @@ val appModule = module {
 
     single { UpdatePostUseCase(get()) }
 
+    single <GetPostsByUserId>{ GetPostsByUserIdImplFlow() }
+
+    single { GetPostsByUserIdUseCase(get()) }
+
     // Rezept 2: "Wenn jemand ein PostsViewModel will, erstelle es.
     // Für die Abhängigkeiten im Konstruktor, nimm das, was du kennst."
     // 'get()' sagt Koin: "Finde eine Abhängigkeit (hier: LocalStorageService.LocalPostsStorage und GetPostsUseCase),
@@ -49,7 +54,8 @@ val appModule = module {
             localPostStorage = get(), // Koin findet die bereitgestellte LocalPostsStorage-Instanz
             getPostsUseCase = get(), // Koin findet die bereitgestellte GetPostsUseCase-Instanz
             createPostUseCase = get(),
-            updatePostUseCase = get()
+            updatePostUseCase = get(),
+            getPostsByUserIdUseCase = get()
         )
     }
 

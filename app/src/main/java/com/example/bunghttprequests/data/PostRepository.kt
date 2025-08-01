@@ -2,9 +2,10 @@ package com.example.bunghttprequests.data
 
 import com.example.bunghttprequests.data.HttpService.client
 import com.example.bunghttprequests.data.PostRepository.getPosts
+import com.example.bunghttprequests.data.PostRepository.getPostsByUserId
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.post
+import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
@@ -35,7 +36,22 @@ object PostRepository {
             }
         } catch (e: Exception){
             println("Fehler beim laden des Posts: ${e.message}")
-        } as List<Post>
+            emptyList()
+        }
+    }
+
+    suspend fun getPostsByUserId(userId: Int? = null): List<Post> {
+        return try {
+            withContext(Dispatchers.IO){
+                client.get("https://jsonplaceholder.typicode.com/posts"){
+                    contentType(ContentType.Application.Json)
+                    userId?.let { parameter("userId", it) }
+                }.body<List<Post>>()
+            }
+        } catch (e: Exception){
+            println("Fehler beim laden des Posts nach userId: ${e.message}")
+            emptyList()
+        }
     }
 
 //    suspend fun getPostsByUserId(userId: Int): List<Post>{
@@ -83,8 +99,17 @@ fun postsDataFlow(): Flow<List<PostRepository.Post>> = flow {
     emit(getPosts())
 }
 
+fun getPostsByIdFlow(userId: Int?): Flow<List<PostRepository.Post>> = flow {
+    emit(getPostsByUserId(userId))
+}
+
+
 interface PostsRepository{
     fun getPostsFlow(): Flow<List<PostRepository.Post>>
+}
+
+interface GetPostsByUserId{
+    fun getPostsByUserIdFlow(userId: Int?): Flow<List<PostRepository.Post>>
 }
 
 interface CreatePost{
@@ -97,6 +122,12 @@ interface UpdatePost{
 
 class PostsRepositoryImplFlow: PostsRepository{
     override fun getPostsFlow(): Flow<List<PostRepository.Post>> = postsDataFlow()
+
+
+}
+
+class GetPostsByUserIdImplFlow: GetPostsByUserId{
+    override fun getPostsByUserIdFlow(userId: Int?): Flow<List<PostRepository.Post>> = getPostsByIdFlow(userId)
 
 
 }

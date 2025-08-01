@@ -24,12 +24,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.AddComment
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -38,9 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,19 +48,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bunghttprequests.card.PostCard
 import com.example.bunghttprequests.data.LocalStorageService
 import org.koin.androidx.compose.koinViewModel
 import com.example.bunghttprequests.data.PostRepository
-import com.example.bunghttprequests.data.PostRepository.createPost
 
 import com.example.bunghttprequests.presentation.viewmodels.PostsViewModel
 import com.example.bunghttprequests.ui.theme.ÜbungHTTPRequestsTheme
 import kotlinx.coroutines.launch
-import java.nio.file.WatchEvent
-import kotlin.collections.set
 
 @Composable
 fun PostsScreen(modifier: Modifier = Modifier) {
@@ -95,6 +84,8 @@ fun PostsScreen(modifier: Modifier = Modifier) {
     var title by remember {
         mutableStateOf("")
     }
+
+    val userId: Int? = 3
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -158,7 +149,8 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                             .width(100.dp),
                         onClick = {
 //                            viewModel.loadAllPosts()
-                            postsViewModel.loadAllPosts()
+//                            postsViewModel.loadAllPosts()
+                            postsViewModel.loadPostsByUserId(userId)
                         }
                     ) {
                         Text("laden")
@@ -208,8 +200,8 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         },
                         modifier = Modifier.padding(start = 65.dp)
                     )
-                    val newPost = PostRepository.Post(userId = 9, title = title, body = eingabe)
-                    val localNewPost = LocalStorageService.LocalPostStorage(userId = 9, title = title, body = eingabe)
+                    val newPost = PostRepository.Post(userId = 11, title = title, body = eingabe)
+                    val localNewPost = LocalStorageService.LocalPostStorage(userId = 11, title = title, body = eingabe)
 
                     Spacer(modifier = Modifier.width(10.dp))
                     Icon(
@@ -254,6 +246,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                 ){
                     items(postsDataList){ post ->
                         PostCard(
+                            userId = post.userId,
                             title = post.title,
                             body = post.body,
                             onClick = {
@@ -342,6 +335,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
 //                                    }
                                         title = ""
                                         eingabe = ""
+                                        selectedPost = null
                                     }
                                 }
                         )
@@ -350,6 +344,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(50.dp))
 
                     PostCard(
+                        userId = post.userId,
                         title = post.title,
                         body = post.body,
                         onClick = {},
