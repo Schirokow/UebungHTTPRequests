@@ -26,6 +26,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AddComment
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -62,9 +63,17 @@ import java.nio.file.WatchEvent
 @Composable
 fun PostsScreen(modifier: Modifier = Modifier) {
 
+    val TAG = "PostsScreen"
+
     val postsViewModel: PostsViewModel = koinViewModel<PostsViewModel>()
 //    val postsDataList by postsViewModel.postsData.collectAsState()
     val postsDataList by postsViewModel.localStorageState.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // State, um ausgewählte Post zu speichern
+    var selectedPost by remember { mutableStateOf<PostRepository.Post?>(null).also {
+        Log.d(TAG, "Selected post state initialized")
+    } }
 
 //    val localPostStorage: LocalStorageService.LocalPostsStorage? = null
 //    val postsDataList by viewModel.postsData.collectAsState()
@@ -77,6 +86,30 @@ fun PostsScreen(modifier: Modifier = Modifier) {
 
     var title by remember {
         mutableStateOf("")
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Alle Posts löschen?") },
+            text = { Text("Möchtest du wirklich alle Posts löschen?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        postsViewModel.deleteAllPosts()
+                        showDeleteDialog = false
+                        Log.d(TAG, "all posts deleted")
+                    }
+                ) {
+                    Text("Löschen")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDeleteDialog = false }) {
+                    Text("Abbrechen")
+                }
+            }
+        )
     }
 
 
@@ -127,8 +160,9 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .width(100.dp),
                         onClick = {
+                            showDeleteDialog = true
 //                            viewModel.deleteAllPosts()
-                            postsViewModel.deleteAllPosts()
+//                            postsViewModel.deleteAllPosts()
 //                    post = emptyList()
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -167,6 +201,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.padding(start = 65.dp)
                     )
                     val newPost = PostRepository.Post(userId = 9, title = title, body = eingabe)
+                    val localNewPost = LocalStorageService.LocalPostStorage(userId = 9, title = title, body = eingabe)
 
                     Spacer(modifier = Modifier.width(10.dp))
                     Icon(
@@ -178,10 +213,12 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                             .clickable{
                                 Log.d("AddIcon", "createPost funktion mit: $newPost ausgefürt")
                                 if (eingabe.isNotBlank()) {
-                                    scope.launch {
-                                        createPost(newPost)
+//                                    scope.launch {
+//                                        createPost(newPost)
+                                        postsViewModel.createNewPost(newPost)
+                                        postsViewModel.insertNewPost(localNewPost)
 //                            localPostStorage?.insertNewPost(newPost)
-                                    }
+//                                    }
                                     title = ""
                                     eingabe = ""
                                 }
@@ -223,9 +260,16 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                                     .size(34.dp)
                                     .clickable{
                                         Log.d("DeleteIcon", "Post mit der Id:${post.id} gelöscht")
-                                        scope.launch {
-                                            postsViewModel.deleteLocalPostById(post.id)
+                                        if (post.userId == 9){
+                                            scope.launch {
+                                                postsViewModel.deleteLocalPostById(post.id)
+                                            }
+                                        } else{
+                                            scope.launch {
+                                                postsViewModel.deleteLocalPostById(post.id)
+                                            }
                                         }
+
                                     }
                             )
 //

@@ -52,6 +52,7 @@ object PostRepository {
                     method = HttpMethod.Post
                     contentType(ContentType.Application.Json)
                     setBody(newPost)
+                    println("suspend fun createPost in PostRepository used")
                 }.body<Post>()
             }
         } catch (e: Exception){
@@ -74,6 +75,18 @@ interface PostsRepository{
     fun getPostsFlow(): Flow<List<PostRepository.Post>>
 }
 
+interface CreatePost{
+    suspend fun createPost(newPost: PostRepository.Post): PostRepository.Post?
+}
+
 class PostsRepositoryImplFlow: PostsRepository{
     override fun getPostsFlow(): Flow<List<PostRepository.Post>> = postsDataFlow()
+
+
+}
+
+class CreatePostImpl: CreatePost{
+    override suspend fun createPost(newPost: PostRepository.Post): PostRepository.Post? {
+        return PostRepository.createPost(newPost)
+    }
 }

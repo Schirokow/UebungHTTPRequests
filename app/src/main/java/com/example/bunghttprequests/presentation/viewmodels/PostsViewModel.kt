@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bunghttprequests.business.event.LocalPostState
 import com.example.bunghttprequests.business.event.PostEvent
+import com.example.bunghttprequests.business.usecases.CreatePostUseCase
 import com.example.bunghttprequests.business.usecases.GetPostsUseCase
 import com.example.bunghttprequests.data.LocalStorageService
 import com.example.bunghttprequests.data.PostRepository
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 
 class PostsViewModel(
     private val localPostStorage: LocalStorageService.LocalPostsStorage,
-    private val getPostsUseCase: GetPostsUseCase
+    private val getPostsUseCase: GetPostsUseCase,
+    private val createPostUseCase: CreatePostUseCase
 //    private val dao: PostsDao
 ): ViewModel() {
 //    private val getPostsUseCase: GetPostsUseCase = GetPostsUseCase()
@@ -95,6 +97,28 @@ class PostsViewModel(
                 Log.e("PostsViewModel", "Error loading Posts: ${e.message}")
             }
 
+        }
+    }
+
+    fun insertNewPost(post: LocalStorageService.LocalPostStorage) {
+        viewModelScope.launch {
+            try {
+                localPostStorage.insertNewPost(post)
+                Log.i("PostsViewModel", "New Post in LocalPostStorage inserted")
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error insert new Post in LocalPostStorage: ${e.message}")
+            }
+        }
+    }
+
+    fun createNewPost(newPost: PostRepository.Post) {
+        viewModelScope.launch {
+            try {
+                createPostUseCase.createNewPost(newPost)
+                Log.i("PostsViewModel", "createNewPost function used")
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error createNewPost function: ${e.message}")
+            }
         }
     }
 

@@ -19,6 +19,7 @@ object LocalStorageService {
 
     interface LocalPostsStorage {
         suspend fun insertLocalPosts(post: List<PostRepository.Post>)
+        suspend fun insertNewPost(post: LocalStorageService.LocalPostStorage)
 
 //        suspend fun insertNewPost(post: PostRepository.Post)
         fun getAllLocalPosts(): Flow<List<LocalPostStorage>>
@@ -41,6 +42,10 @@ object LocalStorageService {
                 )
             }
             dao.insert(postStorageEntities)
+        }
+
+        override suspend fun insertNewPost(post: LocalStorageService.LocalPostStorage){
+            dao.insertNewPost(post)
         }
 
 //        override suspend fun insertNewPost(posts: PostRepository.Post) {

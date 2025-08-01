@@ -1,5 +1,6 @@
 package com.example.bunghttprequests.data
 
+import com.example.bunghttprequests.business.usecases.CreatePostUseCase
 import com.example.bunghttprequests.business.usecases.GetPostsUseCase
 import com.example.bunghttprequests.presentation.viewmodels.PostsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -28,6 +29,12 @@ val appModule = module {
     // Es benötigt ein PostsRepository, das Koin bereits kennt
     single { GetPostsUseCase(get()) }
 
+    single<CreatePost> { CreatePostImpl() }
+
+    // Rezept für CreatePostUseCase
+    // Es benötigt ein PostsRepository, das Koin bereits kennt
+    single { CreatePostUseCase(get()) }
+
     // Rezept 2: "Wenn jemand ein PostsViewModel will, erstelle es.
     // Für die Abhängigkeiten im Konstruktor, nimm das, was du kennst."
     // 'get()' sagt Koin: "Finde eine Abhängigkeit (hier: LocalStorageService.LocalPostsStorage und GetPostsUseCase),
@@ -35,7 +42,8 @@ val appModule = module {
     viewModel {
         PostsViewModel(
             localPostStorage = get(), // Koin findet die bereitgestellte LocalPostsStorage-Instanz
-            getPostsUseCase = get()   // Koin findet die bereitgestellte GetPostsUseCase-Instanz
+            getPostsUseCase = get(), // Koin findet die bereitgestellte GetPostsUseCase-Instanz
+            createPostUseCase = get()
         )
     }
 

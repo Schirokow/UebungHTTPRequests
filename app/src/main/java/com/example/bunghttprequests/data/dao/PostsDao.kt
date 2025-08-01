@@ -14,8 +14,8 @@ interface PostsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(post: List<LocalStorageService.LocalPostStorage>) // Fügt Post ein
 
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    suspend fun insertNewPost(post: PostRepository.Post.Companion)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNewPost(post: LocalStorageService.LocalPostStorage)
 
 
     @Query("SELECT * FROM local_posts")
