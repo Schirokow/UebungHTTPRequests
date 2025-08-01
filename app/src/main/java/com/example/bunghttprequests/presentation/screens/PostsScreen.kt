@@ -289,18 +289,66 @@ fun PostsScreen(modifier: Modifier = Modifier) {
             ){
                 Column (
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 100.dp)
+                        .fillMaxSize()
+                        .padding(top = 130.dp)
                         .align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
 
-//                    Text(
-//                        text = festival.title,
-//                        style = MaterialTheme.typography.headlineMedium,
-//                        color = Color.White,
-//                        modifier = Modifier.padding(bottom = 8.dp)
-//                    )
+                    OutlinedTextField(
+                        value = title,
+                        singleLine = true,
+                        placeholder = {Text("Titel bearbeiten", color = Color.White)},
+                        onValueChange = { text ->
+                            title = text
+                        },
+//                        modifier = Modifier.padding(start = 25.dp)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row (
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+//                        .padding(start = 50.dp)
+                    ){
+
+                        OutlinedTextField(
+                            value = eingabe,
+                            singleLine = true,
+                            placeholder = {Text("Text bearbeiten", color = Color.White)},
+                            onValueChange = { text ->
+                                eingabe = text
+                            },
+                            modifier = Modifier.padding(start = 65.dp)
+                        )
+                        val udatePost = PostRepository.Post(userId = post.userId, id = post.id, title = title, body = eingabe)
+                        val localUdatePost = LocalStorageService.LocalPostStorage(userId = post.userId, id = post.id, title = title, body = eingabe)
+
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Icon(
+                            imageVector = Icons.Rounded.Send,
+                            contentDescription = "Add",
+                            tint = Color.Blue,
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clickable{
+                                    Log.d("AddIcon", "createPost funktion mit: $udatePost ausgefürt")
+                                    if (eingabe.isNotBlank() || title.isNotBlank()) {
+//                                    scope.launch {
+//                                        createPost(newPost)
+                                        postsViewModel.udatePost(udatePost)
+                                        postsViewModel.insertNewPost(localUdatePost)
+//                            localPostStorage?.insertNewPost(newPost)
+//                                    }
+                                        title = ""
+                                        eingabe = ""
+                                    }
+                                }
+                        )
+                    }
+
+                Spacer(modifier = Modifier.height(50.dp))
+
                     PostCard(
                         title = post.title,
                         body = post.body,
@@ -311,29 +359,6 @@ fun PostsScreen(modifier: Modifier = Modifier) {
 //                            .fillMaxHeight(0.5f)
                             .height(300.dp)
                     )
-
-//                    Card (
-//                        modifier = Modifier
-//                            .graphicsLayer(scaleX = animateScale, scaleY = animateScale)
-//                            .fillMaxWidth(0.9f)
-//                            .fillMaxHeight(0.5f)
-//                            .clickable{
-//                                Log.d(TAG, "Navigating to detail screen for id: ${festival.id}")
-//                                navController.navigate("ContentDetailScreen/${festival.id}")
-//                                      },
-//                        shape = RoundedCornerShape(16.dp),
-//                        elevation = CardDefaults.cardElevation(12.dp)
-//                    ){
-//                        Image(
-//                            painter = painterResource(id = festival.imageId),
-//                            contentDescription = "Vergrößertes Bild",
-//                            contentScale = ContentScale.FillBounds,
-//                            modifier = Modifier
-//                                .fillMaxSize()
-//                        )
-//                    }
-
-
                 }
 
                 Icon(
@@ -374,10 +399,6 @@ fun PostsScreen(modifier: Modifier = Modifier) {
 
                         }
                 )
-                //Erklärung:
-                //Der Favoritenstatus wird mit favoriteStates (eine mutableStateMapOf) dynamisch geladen, um UI-Reaktivität zu gewährleisten.
-                //LaunchedEffect lädt den Favoritenstatus für jedes Festival beim Rendern.
-                //Der Favoriten-Button toggelt den Status und aktualisiert favoriteStates.
             }
 
         }
