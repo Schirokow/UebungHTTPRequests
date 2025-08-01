@@ -7,6 +7,7 @@ import com.example.bunghttprequests.business.event.LocalPostState
 import com.example.bunghttprequests.business.event.PostEvent
 import com.example.bunghttprequests.business.usecases.CreatePostUseCase
 import com.example.bunghttprequests.business.usecases.GetPostsUseCase
+import com.example.bunghttprequests.business.usecases.UpdatePostUseCase
 import com.example.bunghttprequests.data.LocalStorageService
 import com.example.bunghttprequests.data.PostRepository
 import com.example.bunghttprequests.data.dao.PostsDao
@@ -21,7 +22,8 @@ import kotlinx.coroutines.launch
 class PostsViewModel(
     private val localPostStorage: LocalStorageService.LocalPostsStorage,
     private val getPostsUseCase: GetPostsUseCase,
-    private val createPostUseCase: CreatePostUseCase
+    private val createPostUseCase: CreatePostUseCase,
+    private val updatePostUseCase: UpdatePostUseCase
 //    private val dao: PostsDao
 ): ViewModel() {
 //    private val getPostsUseCase: GetPostsUseCase = GetPostsUseCase()
@@ -90,6 +92,9 @@ class PostsViewModel(
             try {
                 getPostsUseCase.getPostsFlow().collect { posts ->
                     localPostStorage.insertLocalPosts(posts)
+//                    localPostStorage.getAllLocalPosts().collect { localPosts ->
+//                        _localStorageState.value = localPosts
+//                    }
 //                    _postsData.value = posts
                     Log.i("PostsViewModel", "All Posts loaded")
                 }
@@ -120,6 +125,18 @@ class PostsViewModel(
                 Log.e("PostsViewModel", "Error createNewPost function: ${e.message}")
             }
         }
+    }
+
+    fun udatePost(post: PostRepository.Post) {
+        viewModelScope.launch {
+            try {
+                updatePostUseCase.updatePost(post)
+                Log.i("PostsViewModel", "updatePost function used")
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error updatePost function: ${e.message}")
+            }
+        }
+
     }
 
     

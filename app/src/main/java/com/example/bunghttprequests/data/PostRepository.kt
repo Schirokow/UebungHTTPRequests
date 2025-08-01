@@ -5,6 +5,7 @@ import com.example.bunghttprequests.data.PostRepository.getPosts
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -61,8 +62,19 @@ object PostRepository {
         }
     }
 
-    suspend fun updatePost(post: Post){
-
+    suspend fun updatePost(post: Post): Post?{
+        return try {
+            withContext(Dispatchers.IO){
+                client.put("https://jsonplaceholder.typicode.com/posts/${post.id}"){
+                    contentType(ContentType.Application.Json)
+                    setBody(post)
+                    println("suspend fun updatePost in PostRepository used")
+                }.body<Post>()
+            }
+        } catch (e: Exception){
+            println("Fehler beim Aktualisieren des Posts: ${e.message}")
+            null
+        }
     }
 }
 
@@ -79,6 +91,10 @@ interface CreatePost{
     suspend fun createPost(newPost: PostRepository.Post): PostRepository.Post?
 }
 
+interface UpdatePost{
+    suspend fun updatePost(post: PostRepository.Post): PostRepository.Post?
+}
+
 class PostsRepositoryImplFlow: PostsRepository{
     override fun getPostsFlow(): Flow<List<PostRepository.Post>> = postsDataFlow()
 
@@ -88,5 +104,11 @@ class PostsRepositoryImplFlow: PostsRepository{
 class CreatePostImpl: CreatePost{
     override suspend fun createPost(newPost: PostRepository.Post): PostRepository.Post? {
         return PostRepository.createPost(newPost)
+    }
+}
+
+class UpdatePostImpl: UpdatePost{
+    override suspend fun updatePost(post: PostRepository.Post): PostRepository.Post? {
+        return PostRepository.updatePost(post)
     }
 }
