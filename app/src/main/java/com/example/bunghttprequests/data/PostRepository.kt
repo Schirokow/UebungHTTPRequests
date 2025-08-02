@@ -43,9 +43,8 @@ object PostRepository {
     suspend fun getPostsByUserId(userId: Int? = null): List<Post> {
         return try {
             withContext(Dispatchers.IO){
-                client.get("https://jsonplaceholder.typicode.com/posts"){
+                client.get("https://jsonplaceholder.typicode.com/posts?userId=${userId}"){
                     contentType(ContentType.Application.Json)
-                    userId?.let { parameter("userId", it) }
                 }.body<List<Post>>()
             }
         } catch (e: Exception){
@@ -54,10 +53,7 @@ object PostRepository {
         }
     }
 
-//    suspend fun getPostsByUserId(userId: Int): List<Post>{
-//
-//    }
-//
+
 //    suspend fun getPostById(id: Int): Post?{
 //
 //    }
