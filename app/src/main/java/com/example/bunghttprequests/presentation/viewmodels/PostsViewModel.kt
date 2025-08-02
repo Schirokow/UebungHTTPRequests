@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bunghttprequests.business.usecases.CreatePostUseCase
+import com.example.bunghttprequests.business.usecases.GetPostByIdUseCase
 import com.example.bunghttprequests.business.usecases.GetPostsByUserIdUseCase
 import com.example.bunghttprequests.business.usecases.GetPostsUseCase
 import com.example.bunghttprequests.business.usecases.UpdatePostUseCase
@@ -19,53 +20,19 @@ class PostsViewModel(
     private val getPostsUseCase: GetPostsUseCase,
     private val createPostUseCase: CreatePostUseCase,
     private val updatePostUseCase: UpdatePostUseCase,
-    private val getPostsByUserIdUseCase: GetPostsByUserIdUseCase
-//    private val dao: PostsDao
+    private val getPostsByUserIdUseCase: GetPostsByUserIdUseCase,
+    private val getPostByIdUseCase: GetPostByIdUseCase
 ): ViewModel() {
-//    private val getPostsUseCase: GetPostsUseCase = GetPostsUseCase()
 
 //    private val _postsData = MutableStateFlow<List<PostRepository.Post>>(emptyList())
 //    val postsData: StateFlow<List<PostRepository.Post>> = _postsData.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     private val _localStorageState = MutableStateFlow<List<LocalStorageService.LocalPostStorage>>(emptyList())
     val localStorageState: StateFlow<List<LocalStorageService.LocalPostStorage>> = _localStorageState.asStateFlow()
 
-//
-
-//    fun onEvent(event: PostEvent){
-//        when(event){
-//            is PostEvent.DeletePost -> {
-//                viewModelScope.launch {
-//                    dao.deleteAllLocalPosts()
-//                }
-//
-//            }
-//            PostEvent.HideDialog -> {
-//                _localStorageState.update { it.copy(
-//                    isAddingPost = false
-//                ) }
-//            }
-//            PostEvent.SavePost -> {
-//
-//            }
-//            is PostEvent.SetTitle -> {
-//                _localStorageState.update {it.copy(
-//                    title = event.title
-//                )
-//                }
-//            }
-//            is PostEvent.SetBody -> {
-//                _localStorageState.update { it.copy(
-//                    body = event.body
-//                ) }
-//            }
-//            PostEvent.ShowDialog -> {
-//                _localStorageState.update { it.copy(
-//                    isAddingPost = true
-//                ) }
-//            }
-//        }
-//    }
 
     init {
         viewModelScope.launch {
@@ -85,17 +52,19 @@ class PostsViewModel(
 
     fun loadAllPosts(){
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 getPostsUseCase.getPostsFlow().collect { posts ->
                     localPostStorage.insertLocalPosts(posts)
 //                    localPostStorage.getAllLocalPosts().collect { localPosts ->
 //                        _localStorageState.value = localPosts
 //                    }
-//                    _postsData.value = posts
                     Log.i("PostsViewModel", "All Posts loaded")
                 }
             } catch (e: Exception){
                 Log.e("PostsViewModel", "Error loading Posts: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
 
         }
@@ -103,6 +72,7 @@ class PostsViewModel(
 
     fun loadPostsByUserId(userId: Int?) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 getPostsByUserIdUseCase.getPostsByUserIdFlow(userId).collect { posts ->
                     localPostStorage.insertLocalPosts(posts)
@@ -110,6 +80,32 @@ class PostsViewModel(
                 }
             } catch (e: Exception){
                 Log.e("PostsViewModel", "Error loading Posts by userId: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+
+        }
+    }
+
+    fun loadPostById(id: Int?) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                getPostByIdUseCase.getPostByIdFlow(id).collect { post ->
+                    val localPost = LocalStorageService.LocalPostStorage(
+                        id = post?.id ?: 0,
+                        userId = post?.userId ?: 0,
+                        title = post?.title ?: "",
+                        body = post?.body ?: ""
+                    )
+                    localPostStorage.insertNewPost(localPost)
+                }
+                    Log.i("PostsViewModel", "Post by id is loaded")
+
+            } catch (e: Exception){
+                Log.e("PostsViewModel", "Error loading Posts by userId: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
 
         }
@@ -117,33 +113,42 @@ class PostsViewModel(
 
     fun insertNewPost(post: LocalStorageService.LocalPostStorage) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 localPostStorage.insertNewPost(post)
                 Log.i("PostsViewModel", "New Post in LocalPostStorage inserted")
             } catch (e: Exception) {
                 Log.e("PostsViewModel", "Error insert new Post in LocalPostStorage: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun createNewPost(newPost: PostRepository.Post) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 createPostUseCase.createNewPost(newPost)
                 Log.i("PostsViewModel", "createNewPost function used")
             } catch (e: Exception) {
                 Log.e("PostsViewModel", "Error createNewPost function: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun udatePost(post: PostRepository.Post) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 updatePostUseCase.updatePost(post)
                 Log.i("PostsViewModel", "updatePost function used")
             } catch (e: Exception) {
                 Log.e("PostsViewModel", "Error updatePost function: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
 
@@ -153,23 +158,28 @@ class PostsViewModel(
 
     fun deleteAllPosts() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 localPostStorage.deleteAllLocalPosts()
-//                _postsData.value = emptyList()
                 Log.i("PostsViewModel", "All Posts deleted")
             } catch (e: Exception) {
                 Log.e("PostsViewModel", "Error deleting Posts: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun deleteLocalPostById(id: Int) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 localPostStorage.deleteLocalPostById(id)
                 Log.i("PostsViewModel", "Post by Id:$id deleted")
             } catch (e: Exception) {
                 Log.e("PostsViewModel", "Error deleting Post by Id:$id : ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }

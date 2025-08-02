@@ -48,20 +48,6 @@ object LocalStorageService {
             dao.insertNewPost(post)
         }
 
-//        override suspend fun insertNewPost(posts: PostRepository.Post) {
-////            val newPostStorageEntities = posts.map { post ->
-////                LocalPostStorage(
-////                    // Wenn die ID von der API kommt, verwenden wir sie.
-////                    // Wenn nicht (z.B. bei einem neuen Post), lassen wir Room sie auto-generieren (id = 0).
-////                    userId = post.userId,
-////                    id = post.id?: 0,
-////                    title = post.title,
-////                    body = post.body
-////                )
-////            }
-//            dao.insertNewPost(PostRepository.Post)
-//        }
-
         override fun getAllLocalPosts(): Flow<List<LocalPostStorage>> {
             return dao.getAllLocalPosts()
         }
@@ -79,10 +65,4 @@ object LocalStorageService {
         }
     }
 }
-
-
-
-//fun localStorageDataFlow(): Flow<List<LocalStorageService.LocalPostStorage>> = flow {
-//    emit(LocalStorageService.PostsStorageImpl.getLocalPosts())
-//}
 

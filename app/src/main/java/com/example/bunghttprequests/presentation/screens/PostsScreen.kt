@@ -30,6 +30,7 @@ import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.bunghttprequests.card.PostCard
 import com.example.bunghttprequests.data.LocalStorageService
 import org.koin.androidx.compose.koinViewModel
@@ -65,6 +67,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
     val postsViewModel: PostsViewModel = koinViewModel<PostsViewModel>()
 //    val postsDataList by postsViewModel.postsData.collectAsState()
     val postsDataList by postsViewModel.localStorageState.collectAsState()
+    val isLoading by postsViewModel.isLoading.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     // State, um ausgewählte Post zu speichern
@@ -86,6 +89,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
     }
 
     val userId: Int? = 3
+    val postId: Int? = 33
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -110,14 +114,6 @@ fun PostsScreen(modifier: Modifier = Modifier) {
             }
         )
     }
-
-
-//    if (postsDataList.isEmpty()) {
-//        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//            Text("Keine Posts geladen", color = Color.White, fontSize = 20.sp)
-//        }
-//        return
-//    }
 
     Box (
         modifier = Modifier
@@ -151,9 +147,23 @@ fun PostsScreen(modifier: Modifier = Modifier) {
 //                            viewModel.loadAllPosts()
 //                            postsViewModel.loadAllPosts()
                             postsViewModel.loadPostsByUserId(userId)
+//                            postsViewModel.loadPostById(postId)
                         }
                     ) {
-                        Text("laden")
+                        Text("userId")
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .width(100.dp),
+                        onClick = {
+//                            viewModel.loadAllPosts()
+//                            postsViewModel.loadAllPosts()
+//                            postsViewModel.loadPostsByUserId(userId)
+                            postsViewModel.loadPostById(postId)
+                        }
+                    ) {
+                        Text("postId")
                     }
 
                     Button(
@@ -212,7 +222,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                             .size(34.dp)
                             .clickable{
                                 Log.d("AddIcon", "createPost funktion mit: $newPost ausgefürt")
-                                if (eingabe.isNotBlank()) {
+                                if (eingabe.isNotBlank() || title.isNotBlank()) {
 //                                    scope.launch {
 //                                        createPost(newPost)
                                         postsViewModel.createNewPost(newPost)
@@ -224,39 +234,50 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                                 }
                             }
                     )
-//            Button(
-//                onClick = {
-//                    Log.d("AddButton", "createPost funktion mit: $eingabe ausgefürt")
-//                    if (eingabe.isNotBlank()) {
-//                        scope.launch {
-////                            createPost(eingabe)
-//                        }
-//                        eingabe = ""
-//                    }
-//                }
-//            ) {
-//                Text(text = "Add")
-//            }
                 }
-                LazyColumn (
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp)
-                ){
-                    items(postsDataList){ post ->
-                        PostCard(
-                            userId = post.userId,
-                            title = post.title,
-                            body = post.body,
-                            onClick = {
-                                Log.d(TAG, "Festival card clicked - id: ${post.id}, title: ${post.title.take(15)}...")
-                                selectedPost = post
-                            }
-                        )
 
+                when {
+                    isLoading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color.White)
+                            Text(
+                                "Lade...",
+                                color = Color.White,
+                                fontSize = 28.sp,
+                                modifier = Modifier.padding(top = 70.dp)
+                            )
+                        }
+                    }
+                    else -> {
+                        LazyColumn (
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentPadding = PaddingValues(vertical = 16.dp)
+                        ){
+                            items(postsDataList){ post ->
+                                PostCard(
+                                    userId = post.userId,
+                                    title = post.title,
+                                    body = post.body,
+                                    onClick = {
+                                        Log.d(TAG, "Festival card clicked - id: ${post.id}, title: ${post.title.take(15)}...")
+                                        selectedPost = post
+                                    }
+                                )
+
+                            }
+                        }
                     }
                 }
+
+
+
+
+
             }
 
 
