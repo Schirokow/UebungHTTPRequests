@@ -75,9 +75,6 @@ fun PostsScreen(modifier: Modifier = Modifier) {
         Log.d(TAG, "Selected post state initialized")
     } }
 
-//    val localPostStorage: LocalStorageService.LocalPostsStorage? = null
-//    val postsDataList by viewModel.postsData.collectAsState()
-//    val postsDataList by viewModel.localStorageState.collectAsState()
     val scope = rememberCoroutineScope()
 
     var eingabe by remember {
@@ -90,6 +87,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
 
     val userId: Int? = 3
     val postId: Int? = 33
+    val localUserId = 11
 
     if (showDeleteDialog) {
         AlertDialog(
@@ -144,10 +142,8 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .width(100.dp),
                         onClick = {
-//                            viewModel.loadAllPosts()
 //                            postsViewModel.loadAllPosts()
                             postsViewModel.loadPostsByUserId(userId)
-//                            postsViewModel.loadPostById(postId)
                         }
                     ) {
                         Text("userId")
@@ -157,9 +153,6 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .width(100.dp),
                         onClick = {
-//                            viewModel.loadAllPosts()
-//                            postsViewModel.loadAllPosts()
-//                            postsViewModel.loadPostsByUserId(userId)
                             postsViewModel.loadPostById(postId)
                         }
                     ) {
@@ -171,15 +164,11 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                             .width(100.dp),
                         onClick = {
                             showDeleteDialog = true
-//                            viewModel.deleteAllPosts()
-//                            postsViewModel.deleteAllPosts()
-//                    post = emptyList()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Red
                         )
                     ) {
-
                         Text("löschen")
                     }
                 }
@@ -198,7 +187,6 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-//                        .padding(start = 50.dp)
                 ){
 
                     OutlinedTextField(
@@ -210,8 +198,8 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         },
                         modifier = Modifier.padding(start = 65.dp)
                     )
-                    val newPost = PostRepository.Post(userId = 11, title = title, body = eingabe)
-                    val localNewPost = LocalStorageService.LocalPostStorage(userId = 11, title = title, body = eingabe)
+                    val newPost = PostRepository.Post(userId = localUserId, title = title, body = eingabe)
+                    val localNewPost = LocalStorageService.LocalPostStorage(userId = localUserId, title = title, body = eingabe)
 
                     Spacer(modifier = Modifier.width(10.dp))
                     Icon(
@@ -223,12 +211,8 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                             .clickable{
                                 Log.d("AddIcon", "createPost funktion mit: $newPost ausgefürt")
                                 if (eingabe.isNotBlank() || title.isNotBlank()) {
-//                                    scope.launch {
-//                                        createPost(newPost)
-                                        postsViewModel.createNewPost(newPost)
-                                        postsViewModel.insertNewPost(localNewPost)
-//                            localPostStorage?.insertNewPost(newPost)
-//                                    }
+                                    postsViewModel.createNewPost(newPost)
+                                    postsViewModel.insertNewPost(localNewPost)
                                     title = ""
                                     eingabe = ""
                                 }
@@ -264,7 +248,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                                     title = post.title,
                                     body = post.body,
                                     onClick = {
-                                        Log.d(TAG, "Festival card clicked - id: ${post.id}, title: ${post.title.take(15)}...")
+                                        Log.d(TAG, "PostCard clicked - id: ${post.id}, title: ${post.title.take(15)}...")
                                         selectedPost = post
                                     }
                                 )
@@ -273,14 +257,7 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         }
                     }
                 }
-
-
-
-
-
             }
-
-
         }
     }
 
@@ -315,15 +292,13 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         placeholder = {Text("Titel bearbeiten", color = Color.White)},
                         onValueChange = { text ->
                             title = text
-                        },
-//                        modifier = Modifier.padding(start = 25.dp)
+                        }
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Row (
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-//                        .padding(start = 50.dp)
                     ){
 
                         OutlinedTextField(
@@ -348,12 +323,8 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                                 .clickable{
                                     Log.d("AddIcon", "createPost funktion mit: $udatePost ausgefürt")
                                     if (eingabe.isNotBlank() || title.isNotBlank()) {
-//                                    scope.launch {
-//                                        createPost(newPost)
                                         postsViewModel.udatePost(udatePost)
                                         postsViewModel.insertNewPost(localUdatePost)
-//                            localPostStorage?.insertNewPost(newPost)
-//                                    }
                                         title = ""
                                         eingabe = ""
                                         selectedPost = null
@@ -401,27 +372,14 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         .size(34.dp)
                         .clickable{
                             Log.d("DeleteIcon", "Post mit der Id:${post.id} gelöscht")
-                            if (post.userId == 9){
-                                scope.launch {
-                                    postsViewModel.deleteLocalPostById(post.id)
-                                }
-                                selectedPost = null
-                            } else{
-                                scope.launch {
-                                    postsViewModel.deleteLocalPostById(post.id)
-                                }
-                                selectedPost = null
-                            }
-
+                            postsViewModel.deleteLocalPostById(post.id)
+                            selectedPost = null
                         }
                 )
             }
 
         }
     }
-
-
-
 }
 
 @SuppressLint("ViewModelConstructorInComposable")
