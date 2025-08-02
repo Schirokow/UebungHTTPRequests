@@ -6,6 +6,7 @@ import com.example.bunghttprequests.data.PostRepository.getPostsByUserId
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
@@ -61,7 +62,7 @@ object PostRepository {
     suspend fun createPost(newPost: Post): Post?{
         return try {
             withContext(Dispatchers.IO){
-                client.request("https://jsonplaceholder.typicode.com/posts"){
+                client.post("https://jsonplaceholder.typicode.com/posts"){
                     method = HttpMethod.Post
                     contentType(ContentType.Application.Json)
                     setBody(newPost)
