@@ -32,6 +32,7 @@ object PostRepository {
             withContext(Dispatchers.IO){
                 client.get("https://jsonplaceholder.typicode.com/posts"){
                     contentType(ContentType.Application.Json)
+                    println("suspend fun getPosts in PostRepository used")
                 }.body<List<Post>>()
             }
         } catch (e: Exception){
@@ -45,6 +46,7 @@ object PostRepository {
             withContext(Dispatchers.IO){
                 client.get("https://jsonplaceholder.typicode.com/posts?userId=${userId}"){
                     contentType(ContentType.Application.Json)
+                    println("suspend fun getPostsByUserId in PostRepository used")
                 }.body<List<Post>>()
             }
         } catch (e: Exception){
@@ -59,6 +61,7 @@ object PostRepository {
             withContext(Dispatchers.IO){
                 client.get("https://jsonplaceholder.typicode.com/posts/${id}"){
                     contentType(ContentType.Application.Json)
+                    println("suspend fun getPostById in PostRepository used")
                 }.body<Post>()
             }
         } catch (e: Exception){
