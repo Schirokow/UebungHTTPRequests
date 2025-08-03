@@ -54,10 +54,27 @@ import com.example.bunghttprequests.card.PostCard
 import com.example.bunghttprequests.data.LocalStorageService
 import org.koin.androidx.compose.koinViewModel
 import com.example.bunghttprequests.data.PostRepository
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
+import androidx.compose.ui.unit.dp
+
 
 import com.example.bunghttprequests.presentation.viewmodels.PostsViewModel
 import com.example.bunghttprequests.ui.theme.ÜbungHTTPRequestsTheme
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun PostsScreen(modifier: Modifier = Modifier) {
@@ -177,6 +194,11 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                     value = title,
                     singleLine = true,
                     placeholder = {Text("Titel", color = Color.White)},
+                    textStyle = TextStyle(color = Color.White),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Green,
+                        unfocusedBorderColor = Color.Blue
+                    ),
                     onValueChange = { text ->
                         title = text
                     },
@@ -193,6 +215,11 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         value = eingabe,
                         singleLine = true,
                         placeholder = {Text("Text eingeben", color = Color.White)},
+                        textStyle = TextStyle(color = Color.White),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Green,
+                            unfocusedBorderColor = Color.Blue
+                        ),
                         onValueChange = { text ->
                             eingabe = text
                         },
@@ -290,6 +317,11 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                         value = title,
                         singleLine = true,
                         placeholder = {Text("Titel bearbeiten", color = Color.White)},
+                        textStyle = TextStyle(color = Color.White),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Green,
+                            unfocusedBorderColor = Color.Blue
+                        ),
                         onValueChange = { text ->
                             title = text
                         }
@@ -305,6 +337,11 @@ fun PostsScreen(modifier: Modifier = Modifier) {
                             value = eingabe,
                             singleLine = true,
                             placeholder = {Text("Text bearbeiten", color = Color.White)},
+                            textStyle = TextStyle(color = Color.White),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color.Green,
+                                unfocusedBorderColor = Color.Blue
+                            ),
                             onValueChange = { text ->
                                 eingabe = text
                             },
